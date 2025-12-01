@@ -1,0 +1,116 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "masterrtl"
+version = "0.1.0"
+description = "A Pre-Synthesis PPA Estimation Framework for Any RTL Design"
+readme = "README.md"
+requires-python = ">=3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "Joaquin Armatage"},
+]
+keywords = [
+    "rtl",
+    "vlsi",
+    "eda",
+    "machine-learning",
+    "ppa-estimation",
+    "verilog",
+    "hardware-design",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "networkx>=3.6",
+    "numpy>=2.3.5",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.7.2",
+    "torch>=2.9.1",
+    "xgboost>=3.1.2",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.0",
+    "pytest>=9.0.1",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.7",
+]
+
+[project.urls]
+Homepage = "https://github.com/jarmatage/MasterRTL"
+Repository = "https://github.com/jarmatage/MasterRTL"
+Documentation = "https://github.com/jarmatage/MasterRTL#readme"
+"Bug Tracker" = "https://github.com/jarmatage/MasterRTL/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["masterrtl*"]
+
+[tool.setuptools.package-data]
+masterrtl = ["*.json"]
+
+[tool.black]
+line-length = 100
+target-version = ["py313"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+py_version = 313
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=masterrtl --cov-report=term-missing"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__.py
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+
