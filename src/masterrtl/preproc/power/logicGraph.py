@@ -1,1 +1,0 @@
-../../vlg2ir/logicGraph.py
