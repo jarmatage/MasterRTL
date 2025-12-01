@@ -1,7 +1,7 @@
 import os
 import time
 
-from pyverilog.vparser.parser import parse
+from pyverilog.vparser.parser import parse  # type: ignore
 
 from .ast_analyzer import ASTAnalyzer
 
