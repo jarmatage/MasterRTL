@@ -8,7 +8,7 @@ class DirectedGraphNode:
         self.width = width
         self.father = father
         self.path: list[str] = []
-        self.tr = None
+        self.tr: float | None = None
         self.t1 = 0.5
 
     def update_width(self, width):
