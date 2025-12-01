@@ -1,8 +1,8 @@
 import json
 import pickle
 
-from graph_stat import cal_oper
-from logicGraph import *
+from masterrtl.vlg2ir.directed_graph import DirectedGraph
+from masterrtl.vlg2ir.graph_stat import cal_oper
 
 
 def run_one_design(design_name, cmd, out_path):
@@ -12,7 +12,7 @@ def run_one_design(design_name, cmd, out_path):
         graph = pickle.load(f)
     with open(f"{folder_dir}/{design_name}_{cmd}_node_dict.pkl", "rb") as f:
         node_dict = pickle.load(f)
-    g = Graph()
+    g = DirectedGraph()
     g.init_graph(graph, node_dict)
     feat_vec = cal_oper(g)
     vec_name = out_path + f"/{design_name}_{cmd}_vec_area.json"
