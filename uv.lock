@@ -393,6 +393,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pyverilog" },
     { name = "scikit-learn" },
+    { name = "scipy" },
     { name = "torch" },
     { name = "xgboost" },
 ]
@@ -416,6 +417,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pyverilog", specifier = ">=1.3.0" },
     { name = "scikit-learn", specifier = ">=1.7.2" },
+    { name = "scipy", specifier = ">=1.16.3" },
     { name = "torch", specifier = ">=2.9.1" },
     { name = "xgboost", specifier = ">=3.1.2" },
 ]
