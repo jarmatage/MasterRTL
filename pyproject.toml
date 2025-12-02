@@ -87,6 +87,9 @@ python_version = "3.13"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
+exclude = [
+    "src/masterrtl/pyverilog/",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -98,6 +101,9 @@ addopts = "-v --cov=masterrtl --cov-report=term-missing"
 [tool.ruff]
 line-length = 100
 target-version = "py313"
+exclude = [
+    "src/masterrtl/pyverilog/",
+]
 
 [tool.ruff.lint]
 select = [
