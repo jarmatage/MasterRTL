@@ -403,17 +403,17 @@ def infer_model(design_name, ppa_type, feat_dir, label_dir, model_path):
 
 
 @yosys.command(name="generate-sog")
+@click.argument(
+    "verilog_files",
+    nargs=-1,
+    type=click.Path(exists=True, dir_okay=False),
+    required=True,
+    metavar="VERILOG_FILE",
+)
 @click.option(
     "--design-name",
     required=True,
     help="Name of the design",
-)
-@click.option(
-    "--verilog-files",
-    required=True,
-    multiple=True,
-    type=click.Path(exists=True, dir_okay=False),
-    help="Input Verilog files (can be specified multiple times)",
 )
 @click.option(
     "--output-dir",
