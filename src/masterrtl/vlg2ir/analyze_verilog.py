@@ -42,7 +42,10 @@ def analyze_verilog(
 
     # Parse Verilog
     ast, directives = parse(
-        filelist, preprocess_include=include_paths, preprocess_define=define_macros
+        filelist,
+        preprocess_include=include_paths,
+        preprocess_define=define_macros,
+        outputdir=out_path if out_path else ".",
     )
 
     print("Verilog2AST Finish!")
