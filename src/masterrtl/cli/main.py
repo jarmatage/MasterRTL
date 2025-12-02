@@ -30,6 +30,12 @@ def model():
     pass
 
 
+@cli.group()
+def yosys():
+    """Yosys synthesis and processing commands."""
+    pass
+
+
 @feature.command(name="area")
 @click.option(
     "--design-name",
@@ -394,6 +400,40 @@ def infer_model(design_name, ppa_type, feat_dir, label_dir, model_path):
         click.echo(f"Actual {ppa_type}: {y_test[0]:.6f}")
         error = abs(y_pred[0] - y_test[0]) / y_test[0] * 100
         click.echo(f"Relative error: {error:.2f}%")
+
+
+@yosys.command(name="generate-sog")
+@click.option(
+    "--design-name",
+    required=True,
+    help="Name of the design",
+)
+@click.option(
+    "--verilog-files",
+    required=True,
+    multiple=True,
+    type=click.Path(exists=True, dir_okay=False),
+    help="Input Verilog files (can be specified multiple times)",
+)
+@click.option(
+    "--output-dir",
+    required=True,
+    type=click.Path(file_okay=False),
+    help="Output directory for SOG Verilog file",
+)
+def generate_sog_cmd(design_name, verilog_files, output_dir):
+    """Generate Simple Operator Graph (SOG) from Verilog files using Yosys."""
+    from masterrtl.yosys.generate_sog import generate_sog
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    click.echo(f"Generating SOG for design '{design_name}'...")
+    click.echo(f"Input files: {', '.join(verilog_files)}")
+
+    generate_sog(design_name, list(verilog_files), output_dir)
+
+    output_file = Path(output_dir) / f"{design_name}_sog.v"
+    click.echo(f"SOG generated and saved to {output_file}")
 
 
 if __name__ == "__main__":
