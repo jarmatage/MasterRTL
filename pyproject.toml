@@ -59,6 +59,9 @@ Repository = "https://github.com/jarmatage/MasterRTL"
 Documentation = "https://github.com/jarmatage/MasterRTL#readme"
 "Bug Tracker" = "https://github.com/jarmatage/MasterRTL/issues"
 
+[project.scripts]
+masterrtl = "masterrtl.cli.main:cli"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 

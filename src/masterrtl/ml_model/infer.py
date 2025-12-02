@@ -1,17 +1,17 @@
 # from preprocess import *
 import json
-import pickle
 
 import numpy as np
 from scipy import stats  # type: ignore
 
-from .preprocess import load_data
 
+def load_data_sep(design_name, feat_dir):
+    """Load data for separate testing.
 
-def load_data_sep():
-    design_name = "TinyRocket"
-    feat_dir = "../../example/feature/"
-
+    Args:
+        design_name: Name of the design
+        feat_dir: Directory containing feature JSON files
+    """
     # with open(f'{feat_dir}{design_name}_sog_vec_timing.json', 'r') as f:
     #     feat_timing_lst = json.load(f)
     with open(f"{feat_dir}{design_name}_sog_vec_area.json") as f:
@@ -38,17 +38,3 @@ def calculate_r_mape_rrse(actual, predicted):
     percent_errors = [min(pe, 100) for pe in percent_errors]
     mape = sum(percent_errors) / len(percent_errors)
     return {"r": r, "mape": mape, "rrse": rrse}
-
-
-if __name__ == "__main__":
-    ppa_tpe = "Area"
-    ppa_tpe = "TNS"
-    ppa_tpe = "WNS"
-    ppa_tpe = "Power"
-    model_name = f"../saved_model/xgboost_{ppa_tpe}_model.pkl"
-    with open(model_name, "rb") as f:
-        model = pickle.load(f)
-
-    x_test, y_test = load_data(ppa_tpe)
-    y_pred = model.predict(x_test)
-    print(f"Predicted {ppa_tpe}:", y_pred)

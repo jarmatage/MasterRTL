@@ -147,3 +147,30 @@ def run_all(design_json, bench, design_name=None):
         else:
             print("Current Design:", k)
             run_one_design(k)
+
+
+# Slack calibration
+if __name__ == "__main__":
+    global max_seq, min_seq, save_list_all
+    save_list_all = []
+    max_seq = 0
+    min_seq = 1000000000000
+    design_name = ""
+    # design_name = ''
+    bench_list_all = [
+        "iscas",
+        "itc",
+        "opencores",
+        "VexRiscv",
+        "riscvcores",
+        "chipyard",
+        "NVDLA",
+        "NaxRiscv",
+    ]
+    for bench in bench_list_all:
+        run_all(bench, design_name)
+
+    with open(
+        f"/data/user/qor_predictor/ML_model/timing/data/save_lst_{bench_type}_seq_200.json", "w"
+    ) as f:
+        json.dump(save_list_all, f)

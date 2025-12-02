@@ -131,10 +131,18 @@ def init_node_dict(g: DirectedGraph):
     return node_dict_ret
 
 
-def run_one_design(design_name, cmd, out_path):
-    with open(f"../../example/{cmd}/{design_name}_{cmd}.pkl", "rb") as f:
+def run_one_design(design_name, cmd, input_dir, out_path):
+    """Process delay propagation for a design.
+
+    Args:
+        design_name: Name of the design
+        cmd: Command type (e.g., 'sog')
+        input_dir: Directory containing input pickle files
+        out_path: Output directory for processed files
+    """
+    with open(f"{input_dir}/{design_name}_{cmd}.pkl", "rb") as f:
         graph = pickle.load(f)
-    with open(f"../../example/{cmd}/{design_name}_{cmd}_node_dict.pkl", "rb") as f:
+    with open(f"{input_dir}/{design_name}_{cmd}_node_dict.pkl", "rb") as f:
         node_dict = pickle.load(f)
 
     g = DirectedGraph()

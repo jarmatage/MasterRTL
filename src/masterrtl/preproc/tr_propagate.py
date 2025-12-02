@@ -97,16 +97,23 @@ def update_node_dict(g: DirectedGraph):
     return node_dict_ret
 
 
-def run_one_design(design_name, module_name, out_path):
+def run_one_design(design_name, module_name, module_dir, init_tr_dir, out_path):
+    """Process toggle rate propagation for a design module.
+
+    Args:
+        design_name: Name of the design
+        module_name: Name of the module
+        module_dir: Directory containing module pickle files
+        init_tr_dir: Directory containing initial toggle rate files
+        out_path: Output directory for processed files
+    """
     print("Current Design:", design_name)
     print("Current Module:", module_name)
     cmd = "sog"
     global i
-    folder_dir = f"../../example/module/{design_name}/"
-    with open(f"{folder_dir}/{module_name}_{cmd}.pkl", "rb") as f:
+    with open(f"{module_dir}/{module_name}_{cmd}.pkl", "rb") as f:
         graph = pickle.load(f)
-    folder_dir = f"../../example/module/{design_name}_init_tr/"
-    with open(f"{folder_dir}/{module_name}_{cmd}_node_dict_tr.pkl", "rb") as f:
+    with open(f"{init_tr_dir}/{module_name}_{cmd}_node_dict_tr.pkl", "rb") as f:
         node_dict = pickle.load(f)
     graph = nx.to_dict_of_lists(graph)
 
@@ -126,8 +133,16 @@ def run_one_design(design_name, module_name, out_path):
         pickle.dump(node_dict_new, f)
 
 
-def run_all_hier(bench, out_path):
-    design_hier_json = "./design_hier.json"
+def run_all_hier(bench, design_hier_json, module_dir, init_tr_dir, out_path):
+    """Process all modules in the design hierarchy.
+
+    Args:
+        bench: Benchmark name
+        design_hier_json: Path to design hierarchy JSON file
+        module_dir: Directory containing module pickle files
+        init_tr_dir: Directory containing initial toggle rate files
+        out_path: Output directory for processed files
+    """
     with open(design_hier_json) as f:
         design_hier_data = json.load(f)
         bench_data = design_hier_data[bench]
@@ -138,4 +153,4 @@ def run_all_hier(bench, out_path):
         global runtime
         runtime = 0
         for m in m_lst:
-            run_one_design(k, m, out_path)
+            run_one_design(k, m, module_dir, init_tr_dir, out_path)

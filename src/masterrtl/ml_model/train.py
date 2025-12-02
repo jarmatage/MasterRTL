@@ -1,8 +1,4 @@
-import pickle
-
 import xgboost as xgb
-
-from .preprocess import load_data
 
 
 def train(x_train, y_train):
@@ -10,16 +6,3 @@ def train(x_train, y_train):
     xgbr.fit(x_train, y_train)
 
     return xgbr
-
-
-if __name__ == "__main__":
-    ppa_tpe = "Area"
-    ppa_tpe = "TNS"
-    ppa_tpe = "WNS"
-    ppa_tpe = "Power"
-
-    x, y = load_data(ppa_tpe)
-
-    trained_model = train(x, y)
-    with open(f"../saved_model/xgboost_{ppa_tpe}_model.pkl", "wb") as f:
-        pickle.dump(trained_model, f)

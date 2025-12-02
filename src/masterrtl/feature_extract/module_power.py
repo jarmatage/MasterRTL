@@ -139,14 +139,21 @@ def cal_oper_pwr(g: DirectedGraph):
     return ret_vec
 
 
-def run_one_design(design_name, module_name, out_path):
+def run_one_design(design_name, module_name, module_dir, power_dag_dir, out_path):
+    """Extract module-level power features.
+
+    Args:
+        design_name: Name of the design
+        module_name: Name of the module
+        module_dir: Directory containing module pickle files
+        power_dag_dir: Directory containing power DAG pickle files
+        out_path: Output directory for feature JSON files
+    """
     cmd = "sog"
 
-    folder_dir = f"../../example/module/{design_name}/"
-    with open(f"{folder_dir}/{module_name}_{cmd}.pkl", "rb") as f:
+    with open(f"{module_dir}/{module_name}_{cmd}.pkl", "rb") as f:
         graph = pickle.load(f)
-    folder_dir = "../../example/power_dag/"
-    with open(f"{folder_dir}/{module_name}_{cmd}_node_dict_propagated.pkl", "rb") as f:
+    with open(f"{power_dag_dir}/{module_name}_{cmd}_node_dict_propagated.pkl", "rb") as f:
         node_dict = pickle.load(f)
 
     g = DirectedGraph()
@@ -157,8 +164,17 @@ def run_one_design(design_name, module_name, out_path):
         json.dump(feat_vec, f)
 
 
-def run_all_hier(bench, design_name, out_path):
-    design_hier_json = "../../example/verilog/design_hier.json"
+def run_all_hier(bench, design_name, design_hier_json, module_dir, power_dag_dir, out_path):
+    """Process all modules in the design hierarchy.
+
+    Args:
+        bench: Benchmark name
+        design_name: Name of the design
+        design_hier_json: Path to design hierarchy JSON file
+        module_dir: Directory containing module pickle files
+        power_dag_dir: Directory containing power DAG pickle files
+        out_path: Output directory for feature JSON files
+    """
     with open(design_hier_json) as f:
         design_hier_data = json.load(f)
         bench_data = design_hier_data[bench]
@@ -171,4 +187,4 @@ def run_all_hier(bench, design_name, out_path):
         design_dict = {}
 
         for m in m_lst:
-            run_one_design(k, m, out_path)
+            run_one_design(k, m, module_dir, power_dag_dir, out_path)

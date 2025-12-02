@@ -11,11 +11,18 @@ from masterrtl.vlg2ir.graph_stat import cal_timing
 from .train_path_rfr import train_rfr
 
 
-def run_one_design(design_name, cmd, out_path):
-    folder_dir = "../../example/timing_dag"
-    with open(f"{folder_dir}/{design_name}_{cmd}.pkl", "rb") as f:
+def run_one_design(design_name, cmd, timing_dag_dir, out_path):
+    """Extract timing features from a design using STA.
+
+    Args:
+        design_name: Name of the design
+        cmd: Command type (e.g., 'sog')
+        timing_dag_dir: Directory containing timing DAG pickle files
+        out_path: Output directory for feature JSON files
+    """
+    with open(f"{timing_dag_dir}/{design_name}_{cmd}.pkl", "rb") as f:
         graph = pickle.load(f)
-    with open(f"{folder_dir}/{design_name}_{cmd}_node_dict_init.pkl", "rb") as f:
+    with open(f"{timing_dag_dir}/{design_name}_{cmd}_node_dict_init.pkl", "rb") as f:
         node_dict = pickle.load(f)
     graph = nx.to_dict_of_lists(graph)
 
