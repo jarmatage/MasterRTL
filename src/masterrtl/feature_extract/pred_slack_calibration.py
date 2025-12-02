@@ -48,9 +48,15 @@ def get_seq_num(node_dict):
     return seq_num, total_num
 
 
-def get_dc_lst(design_name, vec_len):
+def get_dc_lst_from_dir(design_name, vec_len, dc_rpt_dir):
+    """Load DC timing report slack values.
+
+    Args:
+        design_name: Name of the design
+        vec_len: Number of slack values to return
+        dc_rpt_dir: Directory containing DC timing reports
+    """
     slack_lst = []
-    dc_rpt_dir = "/data/user/AST_analyzer/PPA_data/timing_rpt_DC"
     with open(f"{dc_rpt_dir}/{design_name}.rpt") as f:
         lines = f.readlines()
     for line in lines:
@@ -83,11 +89,30 @@ def draw_fig(dc_lst, pred_lst_rf, pred_lst_trans, design_name):
     plt.savefig(f"/data/user/AST_analyzer/histogram/fig/{design_name}.png", dpi=300)
 
 
-def run_one_design(design_name, max_seq: int = 0, min_seq: int = 1000000000000):
+def run_one_design(
+    design_name,
+    node_dict_dir,
+    pred_slack_dir,
+    output_dir,
+    dc_rpt_dir=None,
+    cmd="rtlil",
+    max_seq: int = 0,
+    min_seq: int = 1000000000000,
+):
+    """Run slack calibration for a design.
+
+    Args:
+        design_name: Name of the design
+        node_dict_dir: Directory containing node dictionary pickle files
+        pred_slack_dir: Directory containing predicted slack JSON files
+        output_dir: Output directory for calibrated WNS files
+        dc_rpt_dir: Optional directory containing DC timing reports for validation
+        cmd: Command type (default: rtlil)
+        max_seq: Maximum sequence number (default: 0)
+        min_seq: Minimum sequence number (default: 1000000000000)
+    """
     save_list_all = []
-    cmd = "rtlil"
-    folder_dir = "/data/user/AST_analyzer/graph_data"
-    with open(f"{folder_dir}/node_dict_update/{design_name}_{cmd}_node_dict_init.pkl", "rb") as f:
+    with open(f"{node_dict_dir}/{design_name}_{cmd}_node_dict_init.pkl", "rb") as f:
         node_dict = pickle.load(f)
     seq_num, total_num = get_seq_num(node_dict)
     print(seq_num)
@@ -102,40 +127,55 @@ def run_one_design(design_name, max_seq: int = 0, min_seq: int = 1000000000000):
     else:
         vec_len = round(vec_len)
 
-    with open(
-        f"/data/user/qor_predictor/ML_model/timing/data/pred_slack_lst/{design_name}_rf.json"
-    ) as f:
+    with open(f"{pred_slack_dir}/{design_name}_rf.json") as f:
         pred_slack_lst_rf = json.load(f)
 
     vec_len = min([vec_len, len(pred_slack_lst_rf)])
-    dc_slack_lst = get_dc_lst(design_name, vec_len)
     pred_slack_lst_rf = pred_slack_lst_rf[:vec_len]
 
-    print("Real WNS: ", max(dc_slack_lst))
     print("Pred Median WNS: ", np.median(pred_slack_lst_rf))
-    dc_wns = min(dc_slack_lst)
-    # pred_median_rf = np.median(pred_slack_lst_rf)
     pred_median_rf = get_wns_median_based_on_scale(pred_slack_lst_rf, seq_num)
-    pred_mean_rf = np.mean(pred_slack_lst_rf)
-    save_lst = [dc_wns, pred_median_rf, pred_mean_rf]
-    save_list_all.append(save_lst)
 
-    # draw_fig(dc_slack_lst, pred_slack_lst_rf, design_name)
+    # If DC report directory is provided, validate predictions
+    if dc_rpt_dir:
+        dc_slack_lst = get_dc_lst_from_dir(design_name, vec_len, dc_rpt_dir)
+        print("Real WNS: ", max(dc_slack_lst))
+        dc_wns = min(dc_slack_lst)
+        pred_mean_rf = np.mean(pred_slack_lst_rf)
+        save_lst = [dc_wns, pred_median_rf, pred_mean_rf]
+        save_list_all.append(save_lst)
 
-    with open(
-        f"/data/user/qor_predictor/ML_model/timing/data/wns_calibrated/{design_name}_rf.json", "w"
-    ) as f:
+    # Save calibrated WNS
+    with open(f"{output_dir}/{design_name}_rf.json", "w") as f:
         json.dump([pred_median_rf], f)
 
     mul_wns_lst = get_mul_wns(pred_slack_lst_rf)
-    with open(
-        f"/data/user/qor_predictor/ML_model/timing/data/wns_calibrated/{design_name}_rf_mul.json",
-        "w",
-    ) as f:
+    with open(f"{output_dir}/{design_name}_rf_mul.json", "w") as f:
         json.dump(mul_wns_lst, f)
 
+    return pred_median_rf, mul_wns_lst
 
-def run_all(design_json, bench, design_name=None):
+
+def run_all(
+    design_json,
+    bench,
+    node_dict_dir,
+    pred_slack_dir,
+    output_dir,
+    dc_rpt_dir=None,
+    design_name=None,
+):
+    """Run slack calibration for all designs in a benchmark.
+
+    Args:
+        design_json: Path to design JSON file
+        bench: Benchmark name
+        node_dict_dir: Directory containing node dictionary pickle files
+        pred_slack_dir: Directory containing predicted slack JSON files
+        output_dir: Output directory for calibrated WNS files
+        dc_rpt_dir: Optional directory containing DC timing reports
+        design_name: Optional specific design name to process
+    """
     with open(design_json) as f:
         design_data = json.load(f)
         bench_data = design_data[bench]
@@ -143,34 +183,7 @@ def run_all(design_json, bench, design_name=None):
         if design_name:
             if k == design_name:
                 print("Current Design:", k)
-                run_one_design(k)
+                run_one_design(k, node_dict_dir, pred_slack_dir, output_dir, dc_rpt_dir)
         else:
             print("Current Design:", k)
-            run_one_design(k)
-
-
-# Slack calibration
-if __name__ == "__main__":
-    global max_seq, min_seq, save_list_all
-    save_list_all = []
-    max_seq = 0
-    min_seq = 1000000000000
-    design_name = ""
-    # design_name = ''
-    bench_list_all = [
-        "iscas",
-        "itc",
-        "opencores",
-        "VexRiscv",
-        "riscvcores",
-        "chipyard",
-        "NVDLA",
-        "NaxRiscv",
-    ]
-    for bench in bench_list_all:
-        run_all(bench, design_name)
-
-    with open(
-        f"/data/user/qor_predictor/ML_model/timing/data/save_lst_{bench_type}_seq_200.json", "w"
-    ) as f:
-        json.dump(save_list_all, f)
+            run_one_design(k, node_dict_dir, pred_slack_dir, output_dir, dc_rpt_dir)

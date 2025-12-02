@@ -178,6 +178,55 @@ def extract_module_power(
     click.echo(f"Module power features extracted to {output_dir}")
 
 
+@feature.command(name="slack-calibration")
+@click.option(
+    "--design-name",
+    required=True,
+    help="Name of the design",
+)
+@click.option(
+    "--node-dict-dir",
+    required=True,
+    type=click.Path(exists=True, file_okay=False),
+    help="Directory containing node dictionary pickle files",
+)
+@click.option(
+    "--pred-slack-dir",
+    required=True,
+    type=click.Path(exists=True, file_okay=False),
+    help="Directory containing predicted slack JSON files",
+)
+@click.option(
+    "--output-dir",
+    required=True,
+    type=click.Path(file_okay=False),
+    help="Output directory for calibrated WNS files",
+)
+@click.option(
+    "--dc-rpt-dir",
+    type=click.Path(exists=True, file_okay=False),
+    help="Optional directory containing DC timing reports for validation",
+)
+@click.option(
+    "--cmd",
+    default="rtlil",
+    help="Command type (default: rtlil)",
+)
+def extract_slack_calibration(
+    design_name, node_dict_dir, pred_slack_dir, output_dir, dc_rpt_dir, cmd
+):
+    """Calibrate predicted slack values and extract WNS."""
+    from masterrtl.feature_extract.pred_slack_calibration import run_one_design
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    pred_median_rf, mul_wns_lst = run_one_design(
+        design_name, node_dict_dir, pred_slack_dir, output_dir, dc_rpt_dir, cmd
+    )
+    click.echo(f"Predicted median WNS: {pred_median_rf:.6f}")
+    click.echo(f"Multiple WNS estimates: {mul_wns_lst}")
+    click.echo(f"Calibrated WNS saved to {output_dir}")
+
+
 @preproc.command(name="delay")
 @click.option(
     "--design-name",
