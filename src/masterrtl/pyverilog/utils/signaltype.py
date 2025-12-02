@@ -20,52 +20,58 @@ def isType(termtype, matchtype):
 
 
 def isInput(termtype):
-    return isType(termtype, 'Input')
+    return isType(termtype, "Input")
 
 
 def isOutput(termtype):
-    return isType(termtype, 'Output')
+    return isType(termtype, "Output")
 
 
 def isInout(termtype):
-    return isType(termtype, 'Inout')
+    return isType(termtype, "Inout")
 
 
 def isWire(termtype):
-    return isType(termtype, 'Wire')
+    return isType(termtype, "Wire")
 
 
 def isReg(termtype):
-    return isType(termtype, 'Reg')
+    return isType(termtype, "Reg")
 
 
 def isInteger(termtype):
-    return isType(termtype, 'Integer')
+    return isType(termtype, "Integer")
 
 
 def isGenvar(termtype):
-    return isType(termtype, 'Genvar')
+    return isType(termtype, "Genvar")
 
 
 def isParameter(termtype):
-    return isType(termtype, 'Parameter')
+    return isType(termtype, "Parameter")
 
 
 def isLocalparam(termtype):
-    return isType(termtype, 'Localparam')
+    return isType(termtype, "Localparam")
 
 
 def isFunction(termtype):
-    return isType(termtype, 'Function')
+    return isType(termtype, "Function")
 
 
 def isRename(termtype):
-    return isType(termtype, 'Rename')
+    return isType(termtype, "Rename")
 
 
 # Clock/Reset
-regex_clock = ['clk', 'clock', ]
-regex_reset = ['reset', 'rst', ]
+regex_clock = [
+    "clk",
+    "clock",
+]
+regex_reset = [
+    "reset",
+    "rst",
+]
 
 
 def isClock(search_str):
@@ -85,10 +91,10 @@ def isReset(search_str):
 
 
 # Operator
-compare_ops = ('LessThan', 'GreaterThan', 'LassEq', 'GreaterEq', 'Eq', 'NotEq', 'Eql', 'NotEql')
-not_ops = ('Ulnot', 'Unot')
-split_and_ops = ('And', 'Land')
-split_or_ops = ('Or', 'Lor')
+compare_ops = ("LessThan", "GreaterThan", "LassEq", "GreaterEq", "Eq", "NotEq", "Eql", "NotEql")
+not_ops = ("Ulnot", "Unot")
+split_and_ops = ("And", "Land")
+split_or_ops = ("Or", "Lor")
 non_condition_ops = compare_ops + not_ops + split_and_ops + split_or_ops
 
 
