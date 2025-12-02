@@ -20,5 +20,5 @@ masterrtl preproc toggle-rate \
     --bench chipyard \
     --design-hier-json design_hier.json \
     --module-dir module/TinyRocket/ \
-    --init-tr-dir module/TinyRocket_init_tr/ \
+    --init-tr-dir module/TinyRocket_init_tr_converted/ \
     --output-dir results/power_dag/
