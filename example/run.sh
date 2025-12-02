@@ -6,3 +6,9 @@ masterrtl yosys generate-sog \
     --output-dir results \
     verilog/TinyRocket/plusarg_reader.v \
     verilog/TinyRocket/chipyard.TestHarness.TinyRocketConfig.top.v
+
+echo "Verilog to Graph"
+masterrtl yosys analyze-verilog \
+    --design-name Rocket \
+    --output-dir results/ \
+    results/Rocket_sog.v

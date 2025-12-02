@@ -436,5 +436,74 @@ def generate_sog_cmd(design_name, verilog_files, output_dir):
     click.echo(f"SOG generated and saved to {output_file}")
 
 
+@yosys.command(name="analyze-verilog")
+@click.argument(
+    "verilog_files",
+    nargs=-1,
+    type=click.Path(exists=True, dir_okay=False),
+    required=True,
+    metavar="VERILOG_FILE",
+)
+@click.option(
+    "--design-name",
+    required=True,
+    help="Name of the design",
+)
+@click.option(
+    "--cmd",
+    default="sog",
+    type=click.Choice(["ast", "sog"], case_sensitive=False),
+    help="Command type: 'ast' for word-level, 'sog' for bit-level (default: sog)",
+)
+@click.option(
+    "--output-dir",
+    type=click.Path(file_okay=False),
+    help="Output directory for graph pickle files (default: current directory)",
+)
+@click.option(
+    "--include-path",
+    multiple=True,
+    type=click.Path(exists=True, file_okay=False),
+    help="Include paths for preprocessing (can be specified multiple times)",
+)
+@click.option(
+    "--define",
+    multiple=True,
+    help="Macro definitions for preprocessing (can be specified multiple times)",
+)
+def analyze_verilog_cmd(verilog_files, design_name, cmd, output_dir, include_path, define):
+    """Analyze Verilog files and convert to graph representation.
+
+    This command parses Verilog files and creates a graph representation that can be
+    used for feature extraction and PPA estimation. The graph is saved as pickle files.
+    """
+    from masterrtl.vlg2ir.analyze_verilog import analyze_verilog
+
+    if output_dir:
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    click.echo(f"Analyzing Verilog files for design '{design_name}'...")
+    click.echo(f"Mode: {cmd.upper()} ({'word-level AST' if cmd == 'ast' else 'bit-level SOG'})")
+    click.echo(f"Input files: {', '.join(verilog_files)}")
+
+    if include_path:
+        click.echo(f"Include paths: {', '.join(include_path)}")
+    if define:
+        click.echo(f"Macro definitions: {', '.join(define)}")
+
+    analyze_verilog(
+        filelist=list(verilog_files),
+        design_name=design_name,
+        cmd=cmd,
+        out_path=output_dir,
+        include_paths=list(include_path) if include_path else None,
+        define_macros=list(define) if define else None,
+    )
+
+    output_location = output_dir if output_dir else "current directory"
+    click.echo(f"Graph representation saved to {output_location}")
+    click.echo(f"Files: {design_name}_{cmd}.pkl, {design_name}_{cmd}_node_dict.pkl")
+
+
 if __name__ == "__main__":
     cli()
